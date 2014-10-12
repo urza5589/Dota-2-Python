@@ -1,0 +1,38 @@
+__author__ = 'howar_000'
+
+import urllib.request
+import json
+import time
+
+
+
+
+url = 'https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/V001/?key=E6EDFE3C63512F77F1D9005126266ED5'
+listReq = urllib.request.Request(url)
+listRes = urllib.request.urlopen(listReq)
+listData = json.loads(listRes.read().decode('-utf-8'))
+dMatches = listData["result"]["matches"]
+nodeNum = 0
+
+if len(dMatches) !=0:
+    print(len(dMatches))
+    while nodeNum < len(dMatches):
+
+        matchID = listData["result"]["matches"][nodeNum]["match_id"]
+        print(matchID)
+        print(nodeNum)
+        url = 'https://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/V001/?match_id='+str(matchID)+'&key=E6EDFE3C63512F77F1D9005126266ED5'
+        matchReq = urllib.request.Request(url)
+        matchRes = urllib.request.urlopen(matchReq)
+        matchData = json.loads(matchRes.read().decode('-utf-8'))
+        thisMatch = matchData["result"]
+
+        print(json.dumps(thisMatch["radiant_win"],sort_keys=True, indent =4))
+        nodeNum +=1
+        time.sleep(1)
+    print("Finish")
+
+#print(json.dumps(apiHeader, sort_keys=True, indent=4))
+
+
+
