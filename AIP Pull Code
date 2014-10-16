@@ -2,783 +2,824 @@ __author__ = 'howar_000'
 
 import urllib.request
 import json
+from retrying import retry
 import time
 
 
 
+#Opens starting file
+@retry(wait_fixed=1000)
+def inital_call():
+    return('https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/V001/?key=E6EDFE3C63512F77F1D9005126266ED5')
+    url = inital_call()
+    firstReq = urllib.request.Request(url)
+    firstRes = urllib.request.urlopen(firstReq)
+    firstData = json.loads(firstRes.read().decode('-utf-8'))
+    initaldata = firstData["result"]["matches"][0]["match_id"]
+    return(initaldata)
+#stores first match ID
+startmatchid = inital_call()
 
-url = 'https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/V001/?key=E6EDFE3C63512F77F1D9005126266ED5'
-listReq = urllib.request.Request(url)
-listRes = urllib.request.urlopen(listReq)
-listData = json.loads(listRes.read().decode('-utf-8'))
-dMatches = listData["result"]["matches"]
-nodeNum = 0
-datafile = open('workfile', 'a')
+#initalize repeat and data files
+repeat = 0
+matchID = 0
 
-if len(dMatches) !=0:
-    print(len(dMatches))
-    while nodeNum < len(dMatches):
 
-        matchID = listData["result"]["matches"][nodeNum]["match_id"]
-        print(matchID)
-        print(nodeNum)
-        url = 'https://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/V001/?match_id='+str(matchID)+'&key=E6EDFE3C63512F77F1D9005126266ED5'
-        matchReq = urllib.request.Request(url)
-        matchRes = urllib.request.urlopen(matchReq)
-        matchData = json.loads(matchRes.read().decode('-utf-8'))
-        thisMatch = matchData["result"]
 
-		
-		# Save Player 1 Data
-		try:
-                    p1hero            = thisMatch["players"][0]["hero_id"]
-		except:
-                    p1hero            = 0		
+#begins opening sequential matches
 
-		try:
-                    p1item0           = thisMatch["players"][0]["item_0"]
-		except:
-					p1item0           = 0	
-		try:
-                    p1item1           = thisMatch["players"][0]["item_1"]
-		except:
-                    p1item1           = 0						
-		try:
-                    p1item2           = thisMatch["players"][0]["item_2"]
-		except:
-                    p1item2           = 0	
-		try:
-                    p1item3           = thisMatch["players"][0]["item_3"]
-		except:
-                    p1item3           = 0	
-		try:
-                    p1item4           = thisMatch["players"][0]["item_4"]
-		except:
-                    p1item4           = 0	
-		try:
-                    p1item5           = thisMatch["players"][0]["item_5"]
-		except	
-					p1item5           = 0						
-		try:
-                    p1kills           = thisMatch["players"][0]["kills"]
-		except:
-                    p1kills			  = 0
-		try:
-                    p1deahts          = thisMatch["players"][0]["deaths"]
-		except:
-                    p1deahts		  = 0
-		try:
-                    p1assists         = thisMatch["players"][0]["assists"]
-		except:
-                    p1assists		  = 0
-		try:
-                    p1leaver          = thisMatch["players"][0]["leaver_status"]
-		except:
-                    p1leaver		  = 0
-		try:
-                    p1gold            = thisMatch["players"][0]["gold"]
-		except:
-                    p1gold			  = 0
-		try:
-                    p1lasthit         = thisMatch["players"][0]["last_hits"]
-		except:
-                    p1lasthit		  = 0
-		try:
-                    p1denies          = thisMatch["players"][0]["denies"]
-		except:
-                    p1denies		  = 0
-		try:
-                    p1gpm             = thisMatch["players"][0]["gold_per_min"]
-		except:
-                    p1gpm			  = 0
-		try:
-                    p1xpm             = thisMatch["players"][0]["xp_per_min"]
-		except:
-                    p1xpm			  = 0					
-		try:
-                    p1level           = thisMatch["players"][0]["level"]
-		except:
-                    p1level			  = 0
-		
-		# Save Player 2 Data
-		try:
-                    p2hero            = thisMatch["players"][1]["hero_id"]
-		except:
-                    p2hero            = 0		
+while ( repeat < 10):
 
-		try:
-                    p2item0           = thisMatch["players"][1]["item_0"]
-		except:
-					p2item0           = 0	
-		try:
-                    p2item1           = thisMatch["players"][1]["item_1"]
-		except:
-                    p2item1           = 0						
-		try:
-                    p2item2           = thisMatch["players"][1]["item_2"]
-		except:
-                    p2item2           = 0	
-		try:
-                    p2item3           = thisMatch["players"][1]["item_3"]
-		except:
-                    p2item3           = 0	
-		try:
-                    p2item4           = thisMatch["players"][1]["item_4"]
-		except:
-                    p2item4           = 0	
-		try:
-                    p2item5           = thisMatch["players"][1]["item_5"]
-		except	
-					p2item5           = 0						
-		try:
-                    p2kills           = thisMatch["players"][1]["kills"]
-		except:
-                    p2kills			  = 0
-		try:
-                    p2deahts          = thisMatch["players"][1]["deaths"]
-		except:
-                    p2deahts		  = 0
-		try:
-                    p2assists         = thisMatch["players"][1]["assists"]
-		except:
-                    p2assists		  = 0
-		try:
-                    p2leaver          = thisMatch["players"][1]["leaver_status"]
-		except:
-                    p2leaver		  = 0
-		try:
-                    p2gold            = thisMatch["players"][1]["gold"]
-		except:
-                    p2gold			  = 0
-		try:
-                    p2lasthit         = thisMatch["players"][1]["last_hits"]
-		except:
-                    p2lasthit		  = 0
-		try:
-                    p2denies          = thisMatch["players"][1]["denies"]
-		except:
-                    p2denies		  = 0
-		try:
-                    p2gpm             = thisMatch["players"][1]["gold_per_min"]
-		except:
-                    p2gpm			  = 0
-		try:
-                    p2xpm             = thisMatch["players"][1]["xp_per_min"]
-		except:
-                    p2xpm			  = 0					
-		try:
-                    p2level           = thisMatch["players"][1]["level"]
-		except:
-                    p2level			  = 0
-		
-		# Save Player 3 Data
-		try:
-                    p3hero            = thisMatch["players"][2]["hero_id"]
-		except:
-                    p3hero            = 0		
+    #initalize node number and open data files
+    nodeNum = 0
+    datafile = open('workfile.txt', 'a')
+    testfile = open('testfile.txt', 'a')
 
-		try:
-                    p3item0           = thisMatch["players"][2]["item_0"]
-		except:
-					p3item0           = 0	
-		try:
-                    p3item1           = thisMatch["players"][2]["item_1"]
-		except:
-                    p3item1           = 0						
-		try:
-                    p3item2           = thisMatch["players"][2]["item_2"]
-		except:
-                    p3item2           = 0	
-		try:
-                    p3item3           = thisMatch["players"][2]["item_3"]
-		except:
-                    p3item3           = 0	
-		try:
-                    p3item4           = thisMatch["players"][2]["item_4"]
-		except:
-                    p3item4           = 0	
-		try:
-                    p3item5           = thisMatch["players"][2]["item_5"]
-		except	
-					p3item5           = 0						
-		try:
-                    p3kills           = thisMatch["players"][2]["kills"]
-		except:
-                    p3kills			  = 0
-		try:
-                    p3deahts          = thisMatch["players"][2]["deaths"]
-		except:
-                    p3deahts		  = 0
-		try:
-                    p3assists         = thisMatch["players"][2]["assists"]
-		except:
-                    p3assists		  = 0
-		try:
-                    p3leaver          = thisMatch["players"][2]["leaver_status"]
-		except:
-                    p3leaver		  = 0
-		try:
-                    p3gold            = thisMatch["players"][2]["gold"]
-		except:
-                    p3gold			  = 0
-		try:
-                    p3lasthit         = thisMatch["players"][2]["last_hits"]
-		except:
-                    p3lasthit		  = 0
-		try:
-                    p3denies          = thisMatch["players"][2]["denies"]
-		except:
-                    p3denies		  = 0
-		try:
-                    p3gpm             = thisMatch["players"][2]["gold_per_min"]
-		except:
-                    p3gpm			  = 0
-		try:
-                    p3xpm             = thisMatch["players"][2]["xp_per_min"]
-		except:
-                    p3xpm			  = 0					
-		try:
-                    p3level           = thisMatch["players"][2]["level"]
-		except:
-                    p3level			  = 0
-		# Save Player 4 Data
-		try:
-                    p4hero            = thisMatch["players"][3]["hero_id"]
-		except:
-                    p4hero            = 0		
+    #pull next sequence of matches
+    @retry(wait_fixed=1000)
+    def further_calls():
+        url = 'https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/V001/?start_at_match_id='+str(startmatchid)+'&key=E6EDFE3C63512F77F1D9005126266ED5'
+        listReq = urllib.request.Request(url)
+        listRes = urllib.request.urlopen(listReq)
+        listData = json.loads(listRes.read().decode('-utf-8'))
+        return(listData)
 
-		try:
-                    p4item0           = thisMatch["players"][3]["item_0"]
-		except:
-					p4item0           = 0	
-		try:
-                    p4item1           = thisMatch["players"][3]["item_1"]
-		except:
-                    p4item1           = 0						
-		try:
-                    p4item2           = thisMatch["players"][3]["item_2"]
-		except:
-                    p4item2           = 0	
-		try:
-                    p4item3           = thisMatch["players"][3]["item_3"]
-		except:
-                    p4item3           = 0	
-		try:
-                    p4item4           = thisMatch["players"][3]["item_4"]
-		except:
-                    p4item4           = 0	
-		try:
-                    p4item5           = thisMatch["players"][3]["item_5"]
-		except	
-					p4item5           = 0						
-		try:
-                    p4kills           = thisMatch["players"][3]["kills"]
-		except:
-                    p4kills			  = 0
-		try:
-                    p4deahts          = thisMatch["players"][3]["deaths"]
-		except:
-                    p4deahts		  = 0
-		try:
-                    p4assists         = thisMatch["players"][3]["assists"]
-		except:
-                    p4assists		  = 0
-		try:
-                    p4leaver          = thisMatch["players"][3]["leaver_status"]
-		except:
-                    p4leaver		  = 0
-		try:
-                    p4gold            = thisMatch["players"][3]["gold"]
-		except:
-                    p4gold			  = 0
-		try:
-                    p4lasthit         = thisMatch["players"][3]["last_hits"]
-		except:
-                    p4lasthit		  = 0
-		try:
-                    p4denies          = thisMatch["players"][3]["denies"]
-		except:
-                    p4denies		  = 0
-		try:
-                    p4gpm             = thisMatch["players"][3]["gold_per_min"]
-		except:
-                    p4gpm			  = 0
-		try:
-                    p4xpm             = thisMatch["players"][3]["xp_per_min"]
-		except:
-                    p4xpm			  = 0					
-		try:
-                    p4level           = thisMatch["players"][3]["level"]
-		except:
-                    p4level			  = 0
-		
-		
-		# Save Player 5 Data
-		try:
-                    p5hero            = thisMatch["players"][4]["hero_id"]
-		except:
-                    p5hero            = 0		
+    furtherdata = further_calls()
+    dMatches = furtherdata["result"]["matches"]
 
-		try:
-                    p5item0           = thisMatch["players"][4]["item_0"]
-		except:
-					p5item0           = 0	
-		try:
-                    p5item1           = thisMatch["players"][4]["item_1"]
-		except:
-                    p5item1           = 0						
-		try:
-                    p5item2           = thisMatch["players"][4]["item_2"]
-		except:
-                    p5item2           = 0	
-		try:
-                    p5item3           = thisMatch["players"][4]["item_3"]
-		except:
-                    p5item3           = 0	
-		try:
-                    p5item4           = thisMatch["players"][4]["item_4"]
-		except:
-                    p5item4           = 0	
-		try:
-                    p5item5           = thisMatch["players"][4]["item_5"]
-		except	
-					p5item5           = 0						
-		try:
-                    p5kills           = thisMatch["players"][4]["kills"]
-		except:
-                    p5kills			  = 0
-		try:
-                    p5deahts          = thisMatch["players"][4]["deaths"]
-		except:
-                    p5deahts		  = 0
-		try:
-                    p5assists         = thisMatch["players"][4]["assists"]
-		except:
-                    p5assists		  = 0
-		try:
-                    p5leaver          = thisMatch["players"][4]["leaver_status"]
-		except:
-                    p5leaver		  = 0
-		try:
-                    p5gold            = thisMatch["players"][4]["gold"]
-		except:
-                    p5gold			  = 0
-		try:
-                    p5lasthit         = thisMatch["players"][4]["last_hits"]
-		except:
-                    p5lasthit		  = 0
-		try:
-                    p5denies          = thisMatch["players"][4]["denies"]
-		except:
-                    p5denies		  = 0
-		try:
-                    p5gpm             = thisMatch["players"][4]["gold_per_min"]
-		except:
-                    p5gpm			  = 0
-		try:
-                    p5xpm             = thisMatch["players"][4]["xp_per_min"]
-		except:
-                    p5xpm			  = 0					
-		try:
-                    p5level           = thisMatch["players"][4]["level"]
-		except:
-                    p5level			  = 0
-		# Save Player 6 Data
-		try:
-                    p6hero            = thisMatch["players"][5]["hero_id"]
-		except:
-                    p6hero            = 0		
 
-		try:
-                    p6item0           = thisMatch["players"][5]["item_0"]
-		except:
-					p6item0           = 0	
-		try:
-                    p6item1           = thisMatch["players"][5]["item_1"]
-		except:
-                    p6item1           = 0						
-		try:
-                    p6item2           = thisMatch["players"][5]["item_2"]
-		except:
-                    p6item2           = 0	
-		try:
-                    p6item3           = thisMatch["players"][5]["item_3"]
-		except:
-                    p6item3           = 0	
-		try:
-                    p6item4           = thisMatch["players"][5]["item_4"]
-		except:
-                    p6item4           = 0	
-		try:
-                    p6item5           = thisMatch["players"][5]["item_5"]
-		except	
-					p6item5           = 0						
-		try:
-                    p6kills           = thisMatch["players"][5]["kills"]
-		except:
-                    p6kills			  = 0
-		try:
-                    p6deahts          = thisMatch["players"][5]["deaths"]
-		except:
-                    p6deahts		  = 0
-		try:
-                    p6assists         = thisMatch["players"][5]["assists"]
-		except:
-                    p6assists		  = 0
-		try:
-                    p6leaver          = thisMatch["players"][5]["leaver_status"]
-		except:
-                    p6leaver		  = 0
-		try:
-                    p6gold            = thisMatch["players"][5]["gold"]
-		except:
-                    p6gold			  = 0
-		try:
-                    p6lasthit         = thisMatch["players"][5]["last_hits"]
-		except:
-                    p6lasthit		  = 0
-		try:
-                    p6denies          = thisMatch["players"][5]["denies"]
-		except:
-                    p6denies		  = 0
-		try:
-                    p6gpm             = thisMatch["players"][5]["gold_per_min"]
-		except:
-                    p6gpm			  = 0
-		try:
-                    p6xpm             = thisMatch["players"][5]["xp_per_min"]
-		except:
-                    p6xpm			  = 0					
-		try:
-                    p6level           = thisMatch["players"][5]["level"]
-		except:
-                    p6level			  = 0
-	# Save Player 7 Data
-		try:
-                    p7hero            = thisMatch["players"][6]["hero_id"]
-		except:
-                    p7hero            = 0		
 
-		try:
-                    p7item0           = thisMatch["players"][6]["item_0"]
-		except:
-					p7item0           = 0	
-		try:
-                    p7item1           = thisMatch["players"][6]["item_1"]
-		except:
-                    p7item1           = 0						
-		try:
-                    p7item2           = thisMatch["players"][6]["item_2"]
-		except:
-                    p7item2          = 0	
-		try:
-                    p7item3           = thisMatch["players"][6]["item_3"]
-		except:
-                    p7item3           = 0	
-		try:
-                    p7item4           = thisMatch["players"][6]["item_4"]
-		except:
-                    p7item4           = 0	
-		try:
-                    p7item5           = thisMatch["players"][6]["item_5"]
-		except	
-					p7item5           = 0						
-		try:
-                    p7kills           = thisMatch["players"][6]["kills"]
-		except:
-                    p7kills			  = 0
-		try:
-                    p7deahts          = thisMatch["players"][6]["deaths"]
-		except:
-                    p7deahts		  = 0
-		try:
-                    p7assists         = thisMatch["players"][6]["assists"]
-		except:
-                    p7assists		  = 0
-		try:
-                    p7leaver          = thisMatch["players"][6]["leaver_status"]
-		except:
-                    p7leaver		  = 0
-		try:
-                    p7gold            = thisMatch["players"][6]["gold"]
-		except:
-                    p7gold			  = 0
-		try:
-                    p7lasthit         = thisMatch["players"][6]["last_hits"]
-		except:
-                    p7lasthit		  = 0
-		try:
-                    p7denies          = thisMatch["players"][6]["denies"]
-		except:
-                    p7denies		  = 0
-		try:
-                    p7gpm             = thisMatch["players"][6]["gold_per_min"]
-		except:
-                    p7gpm			  = 0
-		try:
-                    p7xpm             = thisMatch["players"][6]["xp_per_min"]
-		except:
-                    p7xpm			  = 0					
-		try:
-                    p7level           = thisMatch["players"][6]["level"]
-		except:
-                    p7level			  = 0
-		
-		# Save Player 8 Data
-		try:
-                    p8hero            = thisMatch["players"][7]["hero_id"]
-		except:
-                    p8hero            = 0		
+#begin parsing matches
 
-		try:
-                    p8item0           = thisMatch["players"][7]["item_0"]
-		except:
-					p8item0           = 0	
-		try:
-                    p8item1           = thisMatch["players"][7]["item_1"]
-		except:
-                    p8item1           = 0						
-		try:
-                    p8item2           = thisMatch["players"][7]["item_2"]
-		except:
-                    p8item2           = 0	
-		try:
-                    p8item3           = thisMatch["players"][7]["item_3"]
-		except:
-                    p8item3           = 0	
-		try:
-                    p8item4           = thisMatch["players"][7]["item_4"]
-		except:
-                    p8item4           = 0	
-		try:
-                    p8item5           = thisMatch["players"][7]["item_5"]
-		except	
-					p8item5           = 0						
-		try:
-                    p8kills           = thisMatch["players"][7]["kills"]
-		except:
-                    p8kills			  = 0
-		try:
-                    p8deahts          = thisMatch["players"][7]["deaths"]
-		except:
-                    p8deahts		  = 0
-		try:
-                    p8assists         = thisMatch["players"][7]["assists"]
-		except:
-                    p8assists		  = 0
-		try:
-                    p8leaver          = thisMatch["players"][7]["leaver_status"]
-		except:
-                    p8leaver		  = 0
-		try:
-                    p8gold            = thisMatch["players"][7]["gold"]
-		except:
-                    p8gold			  = 0
-		try:
-                    p8lasthit         = thisMatch["players"][7]["last_hits"]
-		except:
-                    p8lasthit		  = 0
-		try:
-                    p8denies          = thisMatch["players"][7]["denies"]
-		except:
-                    p8denies		  = 0
-		try:
-                    p8gpm             = thisMatch["players"][7]["gold_per_min"]
-		except:
-                    p8gpm			  = 0
-		try:
-                    p8xpm             = thisMatch["players"][7]["xp_per_min"]
-		except:
-                    p8xpm			  = 0					
-		try:
-                    p8level           = thisMatch["players"][7]["level"]
-		except:
-                    p8level			  = 0
-		
-		# Save Player 9 Data
-		try:
-                    p9hero            = thisMatch["players"][8]["hero_id"]
-		except:
-                    p9hero            = 0		
+    if len(dMatches) !=0:
+        while nodeNum < len(dMatches):
 
-		try:
-                    p9item0           = thisMatch["players"][8]["item_0"]
-		except:
-					p9item0           = 0	
-		try:
-                    p9item1           = thisMatch["players"][8]["item_1"]
-		except:
-                    p9item1           = 0						
-		try:
-                    p9item2           = thisMatch["players"][8]["item_2"]
-		except:
-                    p9item2           = 0	
-		try:
-                    p9item3           = thisMatch["players"][8]["item_3"]
-		except:
-                    p9item3           = 0	
-		try:
-                    p9item4           = thisMatch["players"][8]["item_4"]
-		except:
-                    p9item4           = 0	
-		try:
-                    p9item5           = thisMatch["players"][8]["item_5"]
-		except	
-					p9item5           = 0						
-		try:
-                    p9kills           = thisMatch["players"][8]["kills"]
-		except:
-                    p9kills			  = 0
-		try:
-                    p9deahts          = thisMatch["players"][8]["deaths"]
-		except:
-                    p9deahts		  = 0
-		try:
-                    p9assists         = thisMatch["players"][8]["assists"]
-		except:
-                    p9assists		  = 0
-		try:
-                    p9leaver          = thisMatch["players"][8]["leaver_status"]
-		except:
-                    p9leaver		  = 0
-		try:
-                    p9gold            = thisMatch["players"][8]["gold"]
-		except:
-                    p9gold			  = 0
-		try:
-                    p9lasthit         = thisMatch["players"][8]["last_hits"]
-		except:
-                    p9lasthit		  = 0
-		try:
-                    p9denies          = thisMatch["players"][8]["denies"]
-		except:
-                    p9denies		  = 0
-		try:
-                    p9gpm             = thisMatch["players"][8]["gold_per_min"]
-		except:
-                    p9gpm			  = 0
-		try:
-                    p9xpm             = thisMatch["players"][8]["xp_per_min"]
-		except:
-                    p9xpm			  = 0					
-		try:
-                    p9level           = thisMatch["players"][8]["level"]
-		except:
-                    p9level			  = 0
-		# Save Player 10 Data
-		try:
-                    p10hero            = thisMatch["players"][9]["hero_id"]
-		except:
-                    p10hero            = 0		
+            matchID = furtherdata["result"]["matches"][nodeNum]["match_id"]
+            print(matchID)
+            print(str(repeat)+","+str(nodeNum))
+            url = 'https://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/V001/?match_id='+str(matchID)+'&key=E6EDFE3C63512F77F1D9005126266ED5'
+            matchReq = urllib.request.Request(url)
+            matchRes = urllib.request.urlopen(matchReq)
+            matchData = json.loads(matchRes.read().decode('-utf-8'))
+            thisMatch = matchData["result"]
 
-		try:
-                    p10item0           = thisMatch["players"][9]["item_0"]
-		except:
-					p10item0           = 0	
-		try:
-                    p10item1           = thisMatch["players"][9]["item_1"]
-		except:
-                    p10item1           = 0						
-		try:
-                    p10item2           = thisMatch["players"][9]["item_2"]
-		except:
-                    p10item2           = 0	
-		try:
-                    p10item3           = thisMatch["players"][9]["item_3"]
-		except:
-                    p10item3           = 0	
-		try:
-                    p10item4           = thisMatch["players"][9]["item_4"]
-		except:
-                    p10item4           = 0	
-		try:
-                    p10item5           = thisMatch["players"][9]["item_5"]
-		except	
-					p10item5           = 0						
-		try:
-                    p10kills           = thisMatch["players"][9]["kills"]
-		except:
-                    p10kills		   = 0
-		try:
-                    p10deahts          = thisMatch["players"][9]["deaths"]
-		except:
-                    p10deahts		   = 0
-		try:
-                    p10assists         = thisMatch["players"][9]["assists"]
-		except:
-                    p10assists		   = 0
-		try:
-                    p10leaver          = thisMatch["players"][9]["leaver_status"]
-		except:
-                    p10leaver		   = 0
-		try:
-                    p10gold            = thisMatch["players"][9]["gold"]
-		except:
-                    p10gold			   = 0
-		try:
-                    p10lasthit         = thisMatch["players"][9]["last_hits"]
-		except:
-                    p10lasthit		   = 0
-		try:
-                    p10denies          = thisMatch["players"][9]["denies"]
-		except:
-                    p10denies		   = 0
-		try:
-                    p10gpm             = thisMatch["players"][9]["gold_per_min"]
-		except:
-                    p10gpm			   = 0
-		try:
-                    p10xpm             = thisMatch["players"][9]["xp_per_min"]
-		except:
-                    p10xpm			   = 0					
-		try:
-                    p10level           = thisMatch["players"][9]["level"]
-		except:
-                    p10level		   = 0
-		
-		
-		
-		#nonPlayer Data
-		
-		try:
-                    rwin     		   = thisMatch["radiant_win"]
-		except:
-                    rwin 		       = 0
-		try:
-                    duration           = thisMatch["radiant_win"]
-		except:
-                    duration 		   = 0
-		try:
-                    matchid            = thisMatch["match_id"]
-		except:
-                    matchid 		   = 0
-		try:
-                    lobbytype          = thisMatch["lobby_type"]
-		except:
-                    lobbytype 		   = 0
-		try:
-                    humans             = thisMatch["human_players"]
-		except:
-                    humans 		       = 0
-		try:
-                    gamemode           = thisMatch["game_mode"]
-		except:
-                    gamemode 		   = 0
-				
-		
-	
-		# Combine data		
-		output = p1hero + "," + p1item0 + "," + p1item1 + "," + p1item2 + "," + p1item3 + "," + p1item4 + "," + p1item5 + "," + p1kills + "," + p1deahts + "," + p1assists + "," + p1leaver + "," + p1gold + "," + p1lasthit + "," + p1denies + "," + p1gpm + "," + p1xpm + "," + p1level+","p2hero + "," + p2item0 + "," + p2item1 + "," + p2item2 + "," + p2item3 + "," + p2item4 + "," + p2item5 + "," + p2kills + "," + p2deahts + "," + p2assists + "," + p2leaver + "," + p2gold + "," + p2lasthit + "," + p2denies + "," + p2gpm + "," + p2xpm + "," + p2level+","+p3hero + "," + p3item0 + "," + p3item1 + "," + p3item2 + "," + p3item3 + "," + p3item4 + "," + p3item5 + "," + p3kills + "," + p3deahts + "," + p3assists + "," + p3leaver + "," + p3gold + "," + p3lasthit + "," + p3denies + "," + p3gpm + "," + p3xpm + "," + p3level+","+p4hero + "," + p4item0 + "," + p4item1 + "," + p4item2 + "," + p4item4 + "," + p4item4 + "," + p4item5 + "," + p4kills + "," + p4deahts + "," + p4assists + "," + p4leaver + "," + p4gold + "," + p4lasthit + "," + p4denies + "," + p4gpm + "," + p4xpm + "," + p4level+","+p5hero + "," + p5item0 + "," + p5item1 + "," + p5item2 + "," + p5item5 + "," + p5item5 + "," + p5item5 + "," + p5kills + "," + p5deahts + "," + p5assists + "," + p5leaver + "," + p5gold + "," + p5lasthit + "," + p5denies + "," + p5gpm + "," + p5xpm + "," + p5level+","+p6hero + "," + p6item0 + "," + p6item1 + "," + p6item2 + "," + p6item3 + "," + p6item4 + "," + p6item5 + "," + p6kills + "," + p6deahts + "," + p6assists + "," + p6leaver + "," + p6gold + "," + p6lasthit + "," + p6denies + "," + p6gpm + "," + p6xpm + "," + p6level+","+p7hero + "," + p7item0 + "," + p7item1 + "," + p7item2 + "," + p7item3 + "," + p7item4 + "," + p7item5 + "," + p7kills + "," + p7deahts + "," + p7assists + "," + p7leaver + "," + p7gold + "," + p7lasthit + "," + p7denies + "," + p7gpm + "," + p7xpm + "," + p7level+","p8hero + "," + p8item0 + "," + p8item1 + "," + p8item2 + "," + p8item3 + "," + p8item4 + "," + p8item5 + "," + p8kills + "," + p8deahts + "," + p8assists + "," + p8leaver + "," + p8gold + "," + p8lasthit + "," + p8denies + "," + p8gpm + "," + p8xpm + "," + p8level+","+p9hero + "," + p9item0 + "," + p9item1 + "," + p9item2 + "," + p9item3 + "," + p9item4 + "," + p9item5 + "," + p9kills + "," + p9deahts + "," + p9assists + "," + p9leaver + "," + p9gold + "," + p9lasthit + "," + p9denies + "," + p9gpm + "," + p9xpm + "," + p9level+","+p10hero + "," + p10item0 + "," + p10item1 + "," + p10item2 + "," + p10item4 + "," + p10item4 + "," + p10item5 + "," + p10kills + "," + p10deahts + "," + p10assists + "," + p10leaver + "," + p10gold + "," + p10lasthit + "," + p10denies + "," + p10gpm + "," + p10xpm + "," + p10level+","+rwin+","+duration+","+matchid+","+lobbytype+","+humans+","+gamemode
 
-		#output  data
-		datafile.write(output)
-		
-        #print(json.dumps(thisMatch["radiant_win"],sort_keys=True, indent =4))
-        nodeNum +=1
-        time.sleep(1)
-    print("Finish")
+            # Save Player 1 Data
+            try:
+                    p1hero = thisMatch["players"][0]["hero_id"]
+            except:
+                    p1hero = 0
+
+            try:
+                    p1item0 = thisMatch["players"][0]["item_0"]
+            except:
+                    p1item0 = 0
+            try:
+                    p1item1 = thisMatch["players"][0]["item_1"]
+            except:
+                    p1item1 = 0
+            try:
+                    p1item2 = thisMatch["players"][0]["item_2"]
+            except:
+                    p1item2 = 0
+            try:
+                    p1item3 = thisMatch["players"][0]["item_3"]
+            except:
+                    p1item3 = 0
+            try:
+                    p1item4 = thisMatch["players"][0]["item_4"]
+            except:
+                    p1item4 = 0
+            try:
+                    p1item5 = thisMatch["players"][0]["item_5"]
+            except:
+                    p1item5 = 0
+            try:
+                    p1kills = thisMatch["players"][0]["kills"]
+            except:
+                    p1kills = 0
+            try:
+                    p1deaths = thisMatch["players"][0]["deaths"]
+            except:
+                    p1deaths = 0
+            try:
+                    p1assists = thisMatch["players"][0]["assists"]
+            except:
+                    p1assists = 0
+            try:
+                    p1leaver = thisMatch["players"][0]["leaver_status"]
+            except:
+                    p1leaver = 0
+            try:
+                    p1gold = thisMatch["players"][0]["gold"]
+            except:
+                    p1gold = 0
+            try:
+                    p1lasthit = thisMatch["players"][0]["last_hits"]
+            except:
+                    p1lasthit = 0
+            try:
+                    p1denies = thisMatch["players"][0]["denies"]
+            except:
+                    p1denies = 0
+            try:
+                    p1gpm = thisMatch["players"][0]["gold_per_min"]
+            except:
+                    p1gpm = 0
+            try:
+                    p1xpm = thisMatch["players"][0]["xp_per_min"]
+            except:
+                    p1xpm = 0
+            try:
+                    p1level = thisMatch["players"][0]["level"]
+            except:
+                    p1level = 0
+
+            # Save Player 2 Data
+            try:
+                    p2hero = thisMatch["players"][1]["hero_id"]
+            except:
+                    p2hero = 0
+
+            try:
+                    p2item0 = thisMatch["players"][1]["item_0"]
+            except:
+                    p2item0 = 0
+            try:
+                    p2item1 = thisMatch["players"][1]["item_1"]
+            except:
+                    p2item1 = 0
+            try:
+                    p2item2 = thisMatch["players"][1]["item_2"]
+            except:
+                    p2item2 = 0
+            try:
+                    p2item3 = thisMatch["players"][1]["item_3"]
+            except:
+                    p2item3 = 0
+            try:
+                    p2item4 = thisMatch["players"][1]["item_4"]
+            except:
+                    p2item4 = 0
+            try:
+                    p2item5 = thisMatch["players"][1]["item_5"]
+            except:
+                    p2item5 = 0
+            try:
+                    p2kills = thisMatch["players"][1]["kills"]
+            except:
+                    p2kills = 0
+            try:
+                    p2deaths = thisMatch["players"][1]["deaths"]
+            except:
+                    p2deaths = 0
+            try:
+                    p2assists = thisMatch["players"][1]["assists"]
+            except:
+                    p2assists = 0
+            try:
+                    p2leaver = thisMatch["players"][1]["leaver_status"]
+            except:
+                    p2leaver = 0
+            try:
+                    p2gold = thisMatch["players"][1]["gold"]
+            except:
+                    p2gold = 0
+            try:
+                    p2lasthit = thisMatch["players"][1]["last_hits"]
+            except:
+                    p2lasthit = 0
+            try:
+                    p2denies = thisMatch["players"][1]["denies"]
+            except:
+                    p2denies = 0
+            try:
+                    p2gpm = thisMatch["players"][1]["gold_per_min"]
+            except:
+                    p2gpm = 0
+            try:
+                    p2xpm = thisMatch["players"][1]["xp_per_min"]
+            except:
+                    p2xpm = 0
+            try:
+                    p2level = thisMatch["players"][1]["level"]
+            except:
+                    p2level = 0
+
+            # Save Player 3 Data
+            try:
+                    p3hero = thisMatch["players"][2]["hero_id"]
+            except:
+                    p3hero = 0
+
+            try:
+                    p3item0 = thisMatch["players"][2]["item_0"]
+            except:
+                    p3item0 = 0
+            try:
+                    p3item1 = thisMatch["players"][2]["item_1"]
+            except:
+                    p3item1 = 0
+            try:
+                    p3item2 = thisMatch["players"][2]["item_2"]
+            except:
+                    p3item2 = 0
+            try:
+                    p3item3 = thisMatch["players"][2]["item_3"]
+            except:
+                    p3item3 = 0
+            try:
+                    p3item4 = thisMatch["players"][2]["item_4"]
+            except:
+                    p3item4 = 0
+            try:
+                    p3item5 = thisMatch["players"][2]["item_5"]
+            except:
+                    p3item5 = 0
+            try:
+                    p3kills = thisMatch["players"][2]["kills"]
+            except:
+                    p3kills = 0
+            try:
+                    p3deaths = thisMatch["players"][2]["deaths"]
+            except:
+                    p3deaths = 0
+            try:
+                    p3assists = thisMatch["players"][2]["assists"]
+            except:
+                    p3assists = 0
+            try:
+                    p3leaver = thisMatch["players"][2]["leaver_status"]
+            except:
+                    p3leaver = 0
+            try:
+                    p3gold = thisMatch["players"][2]["gold"]
+            except:
+                    p3gold = 0
+            try:
+                    p3lasthit = thisMatch["players"][2]["last_hits"]
+            except:
+                    p3lasthit = 0
+            try:
+                    p3denies = thisMatch["players"][2]["denies"]
+            except:
+                    p3denies = 0
+            try:
+                    p3gpm = thisMatch["players"][2]["gold_per_min"]
+            except:
+                    p3gpm = 0
+            try:
+                    p3xpm = thisMatch["players"][2]["xp_per_min"]
+            except:
+                    p3xpm = 0
+            try:
+                    p3level = thisMatch["players"][2]["level"]
+            except:
+                    p3level = 0
+            # Save Player 4 Data
+            try:
+                    p4hero = thisMatch["players"][3]["hero_id"]
+            except:
+                    p4hero = 0
+
+            try:
+                    p4item0 = thisMatch["players"][3]["item_0"]
+            except:
+                    p4item0 = 0
+            try:
+                    p4item1 = thisMatch["players"][3]["item_1"]
+            except:
+                    p4item1 = 0
+            try:
+                    p4item2 = thisMatch["players"][3]["item_2"]
+            except:
+                    p4item2 = 0
+            try:
+                    p4item3 = thisMatch["players"][3]["item_3"]
+            except:
+                    p4item3 = 0
+            try:
+                    p4item4 = thisMatch["players"][3]["item_4"]
+            except:
+                    p4item4 = 0
+            try:
+                    p4item5 = thisMatch["players"][3]["item_5"]
+            except:
+                    p4item5 = 0
+            try:
+                    p4kills = thisMatch["players"][3]["kills"]
+            except:
+                    p4kills = 0
+            try:
+                    p4deaths = thisMatch["players"][3]["deaths"]
+            except:
+                    p4deaths = 0
+            try:
+                    p4assists = thisMatch["players"][3]["assists"]
+            except:
+                    p4assists = 0
+            try:
+                    p4leaver = thisMatch["players"][3]["leaver_status"]
+            except:
+                    p4leaver = 0
+            try:
+                    p4gold = thisMatch["players"][3]["gold"]
+            except:
+                    p4gold = 0
+            try:
+                    p4lasthit = thisMatch["players"][3]["last_hits"]
+            except:
+                    p4lasthit = 0
+            try:
+                    p4denies = thisMatch["players"][3]["denies"]
+            except:
+                    p4denies = 0
+            try:
+                    p4gpm = thisMatch["players"][3]["gold_per_min"]
+            except:
+                    p4gpm = 0
+            try:
+                    p4xpm = thisMatch["players"][3]["xp_per_min"]
+            except:
+                    p4xpm = 0
+            try:
+                    p4level = thisMatch["players"][3]["level"]
+            except:
+                    p4level = 0
+
+
+            # Save Player 5 Data
+            try:
+                    p5hero = thisMatch["players"][4]["hero_id"]
+            except:
+                    p5hero = 0
+
+            try:
+                    p5item0 = thisMatch["players"][4]["item_0"]
+            except:
+                    p5item0 = 0
+            try:
+                    p5item1 = thisMatch["players"][4]["item_1"]
+            except:
+                    p5item1 = 0
+            try:
+                    p5item2 = thisMatch["players"][4]["item_2"]
+            except:
+                    p5item2 = 0
+            try:
+                    p5item3 = thisMatch["players"][4]["item_3"]
+            except:
+                    p5item3 = 0
+            try:
+                    p5item4 = thisMatch["players"][4]["item_4"]
+            except:
+                    p5item4 = 0
+            try:
+                    p5item5 = thisMatch["players"][4]["item_5"]
+            except:
+                    p5item5 = 0
+            try:
+                    p5kills = thisMatch["players"][4]["kills"]
+            except:
+                    p5kills = 0
+            try:
+                    p5deaths = thisMatch["players"][4]["deaths"]
+            except:
+                    p5deaths = 0
+            try:
+                    p5assists = thisMatch["players"][4]["assists"]
+            except:
+                    p5assists = 0
+            try:
+                    p5leaver = thisMatch["players"][4]["leaver_status"]
+            except:
+                    p5leaver = 0
+            try:
+                    p5gold = thisMatch["players"][4]["gold"]
+            except:
+                    p5gold = 0
+            try:
+                    p5lasthit = thisMatch["players"][4]["last_hits"]
+            except:
+                    p5lasthit = 0
+            try:
+                    p5denies = thisMatch["players"][4]["denies"]
+            except:
+                    p5denies = 0
+            try:
+                    p5gpm = thisMatch["players"][4]["gold_per_min"]
+            except:
+                    p5gpm = 0
+            try:
+                    p5xpm = thisMatch["players"][4]["xp_per_min"]
+            except:
+                    p5xpm = 0
+            try:
+                    p5level = thisMatch["players"][4]["level"]
+            except:
+                    p5level = 0
+            # Save Player 6 Data
+            try:
+                    p6hero = thisMatch["players"][5]["hero_id"]
+            except:
+                    p6hero = 0
+
+            try:
+                    p6item0 = thisMatch["players"][5]["item_0"]
+            except:
+                    p6item0 = 0
+            try:
+                    p6item1 = thisMatch["players"][5]["item_1"]
+            except:
+                    p6item1 = 0
+            try:
+                    p6item2 = thisMatch["players"][5]["item_2"]
+            except:
+                    p6item2 = 0
+            try:
+                    p6item3 = thisMatch["players"][5]["item_3"]
+            except:
+                    p6item3 = 0
+            try:
+                    p6item4 = thisMatch["players"][5]["item_4"]
+            except:
+                    p6item4 = 0
+            try:
+                    p6item5 = thisMatch["players"][5]["item_5"]
+            except:
+                    p6item5 = 0
+            try:
+                    p6kills = thisMatch["players"][5]["kills"]
+            except:
+                    p6kills = 0
+            try:
+                    p6deaths = thisMatch["players"][5]["deaths"]
+            except:
+                    p6deaths = 0
+            try:
+                    p6assists = thisMatch["players"][5]["assists"]
+            except:
+                    p6assists = 0
+            try:
+                    p6leaver = thisMatch["players"][5]["leaver_status"]
+            except:
+                    p6leaver = 0
+            try:
+                    p6gold = thisMatch["players"][5]["gold"]
+            except:
+                    p6gold = 0
+            try:
+                    p6lasthit = thisMatch["players"][5]["last_hits"]
+            except:
+                    p6lasthit = 0
+            try:
+                    p6denies = thisMatch["players"][5]["denies"]
+            except:
+                    p6denies = 0
+            try:
+                    p6gpm = thisMatch["players"][5]["gold_per_min"]
+            except:
+                    p6gpm = 0
+            try:
+                    p6xpm = thisMatch["players"][5]["xp_per_min"]
+            except:
+                    p6xpm = 0
+            try:
+                    p6level = thisMatch["players"][5]["level"]
+            except:
+                    p6level = 0
+            # Save Player 7 Data
+            try:
+                    p7hero = thisMatch["players"][6]["hero_id"]
+            except:
+                    p7hero = 0
+
+            try:
+                    p7item0 = thisMatch["players"][6]["item_0"]
+            except:
+                    p7item0 = 0
+            try:
+                    p7item1 = thisMatch["players"][6]["item_1"]
+            except:
+                    p7item1 = 0
+            try:
+                    p7item2 = thisMatch["players"][6]["item_2"]
+            except:
+                    p7item2 = 0
+            try:
+                    p7item3 = thisMatch["players"][6]["item_3"]
+            except:
+                    p7item3 = 0
+            try:
+                    p7item4 = thisMatch["players"][6]["item_4"]
+            except:
+                    p7item4 = 0
+            try:
+                    p7item5 = thisMatch["players"][6]["item_5"]
+            except:
+                    p7item5 = 0
+            try:
+                    p7kills = thisMatch["players"][6]["kills"]
+            except:
+                    p7kills = 0
+            try:
+                    p7deaths = thisMatch["players"][6]["deaths"]
+            except:
+                    p7deaths = 0
+            try:
+                    p7assists = thisMatch["players"][6]["assists"]
+            except:
+                    p7assists = 0
+            try:
+                    p7leaver = thisMatch["players"][6]["leaver_status"]
+            except:
+                    p7leaver = 0
+            try:
+                    p7gold = thisMatch["players"][6]["gold"]
+            except:
+                    p7gold = 0
+            try:
+                    p7lasthit = thisMatch["players"][6]["last_hits"]
+            except:
+                    p7lasthit = 0
+            try:
+                    p7denies = thisMatch["players"][6]["denies"]
+            except:
+                    p7denies = 0
+            try:
+                    p7gpm = thisMatch["players"][6]["gold_per_min"]
+            except:
+                    p7gpm = 0
+            try:
+                    p7xpm = thisMatch["players"][6]["xp_per_min"]
+            except:
+                    p7xpm = 0
+            try:
+                    p7level = thisMatch["players"][6]["level"]
+            except:
+                    p7level = 0
+
+            # Save Player 8 Data
+            try:
+                    p8hero = thisMatch["players"][7]["hero_id"]
+            except:
+                    p8hero = 0
+
+            try:
+                    p8item0 = thisMatch["players"][7]["item_0"]
+            except:
+                    p8item0 = 0
+            try:
+                    p8item1 = thisMatch["players"][7]["item_1"]
+            except:
+                    p8item1 = 0
+            try:
+                    p8item2 = thisMatch["players"][7]["item_2"]
+            except:
+                    p8item2 = 0
+            try:
+                    p8item3 = thisMatch["players"][7]["item_3"]
+            except:
+                    p8item3 = 0
+            try:
+                    p8item4 = thisMatch["players"][7]["item_4"]
+            except:
+                    p8item4 = 0
+            try:
+                    p8item5 = thisMatch["players"][7]["item_5"]
+            except:
+                    p8item5 = 0
+            try:
+                    p8kills = thisMatch["players"][7]["kills"]
+            except:
+                    p8kills = 0
+            try:
+                    p8deaths = thisMatch["players"][7]["deaths"]
+            except:
+                    p8deaths = 0
+            try:
+                    p8assists = thisMatch["players"][7]["assists"]
+            except:
+                    p8assists = 0
+            try:
+                    p8leaver = thisMatch["players"][7]["leaver_status"]
+            except:
+                    p8leaver = 0
+            try:
+                    p8gold = thisMatch["players"][7]["gold"]
+            except:
+                    p8gold = 0
+            try:
+                    p8lasthit = thisMatch["players"][7]["last_hits"]
+            except:
+                    p8lasthit = 0
+            try:
+                    p8denies = thisMatch["players"][7]["denies"]
+            except:
+                    p8denies = 0
+            try:
+                    p8gpm = thisMatch["players"][7]["gold_per_min"]
+            except:
+                    p8gpm = 0
+            try:
+                    p8xpm = thisMatch["players"][7]["xp_per_min"]
+            except:
+                    p8xpm = 0
+            try:
+                    p8level = thisMatch["players"][7]["level"]
+            except:
+                    p8level = 0
+
+            # Save Player 9 Data
+            try:
+                    p9hero = thisMatch["players"][8]["hero_id"]
+            except:
+                    p9hero = 0
+
+            try:
+                    p9item0 = thisMatch["players"][8]["item_0"]
+            except:
+                    p9item0 = 0
+            try:
+                    p9item1 = thisMatch["players"][8]["item_1"]
+            except:
+                    p9item1 = 0
+            try:
+                    p9item2 = thisMatch["players"][8]["item_2"]
+            except:
+                    p9item2 = 0
+            try:
+                    p9item3 = thisMatch["players"][8]["item_3"]
+            except:
+                    p9item3 = 0
+            try:
+                    p9item4 = thisMatch["players"][8]["item_4"]
+            except:
+                    p9item4 = 0
+            try:
+                    p9item5 = thisMatch["players"][8]["item_5"]
+            except:
+                    p9item5 = 0
+            try:
+                    p9kills = thisMatch["players"][8]["kills"]
+            except:
+                    p9kills = 0
+            try:
+                    p9deaths = thisMatch["players"][8]["deaths"]
+            except:
+                    p9deaths = 0
+            try:
+                    p9assists = thisMatch["players"][8]["assists"]
+            except:
+                    p9assists = 0
+            try:
+                    p9leaver = thisMatch["players"][8]["leaver_status"]
+            except:
+                    p9leaver = 0
+            try:
+                    p9gold = thisMatch["players"][8]["gold"]
+            except:
+                    p9gold = 0
+            try:
+                    p9lasthit = thisMatch["players"][8]["last_hits"]
+            except:
+                    p9lasthit = 0
+            try:
+                    p9denies = thisMatch["players"][8]["denies"]
+            except:
+                    p9denies = 0
+            try:
+                    p9gpm = thisMatch["players"][8]["gold_per_min"]
+            except:
+                    p9gpm = 0
+            try:
+                    p9xpm = thisMatch["players"][8]["xp_per_min"]
+            except:
+                    p9xpm = 0
+            try:
+                    p9level = thisMatch["players"][8]["level"]
+            except:
+                    p9level = 0
+            # Save Player 10 Data
+            try:
+                    p10hero = thisMatch["players"][9]["hero_id"]
+            except:
+                    p10hero = 0
+
+            try:
+                    p10item0 = thisMatch["players"][9]["item_0"]
+            except:
+                    p10item0 = 0
+            try:
+                    p10item1 = thisMatch["players"][9]["item_1"]
+            except:
+                    p10item1 = 0
+            try:
+                    p10item2 = thisMatch["players"][9]["item_2"]
+            except:
+                    p10item2 = 0
+            try:
+                    p10item3 = thisMatch["players"][9]["item_3"]
+            except:
+                    p10item3 = 0
+            try:
+                    p10item4 = thisMatch["players"][9]["item_4"]
+            except:
+                    p10item4 = 0
+            try:
+                    p10item5 = thisMatch["players"][9]["item_5"]
+            except:
+                    p10item5 = 0
+            try:
+                    p10kills = thisMatch["players"][9]["kills"]
+            except:
+                    p10kills = 0
+            try:
+                    p10deaths = thisMatch["players"][9]["deaths"]
+            except:
+                    p10deaths = 0
+            try:
+                    p10assists = thisMatch["players"][9]["assists"]
+            except:
+                    p10assists = 0
+            try:
+                    p10leaver = thisMatch["players"][9]["leaver_status"]
+            except:
+                    p10leaver = 0
+            try:
+                    p10gold = thisMatch["players"][9]["gold"]
+            except:
+                    p10gold = 0
+            try:
+                    p10lasthit = thisMatch["players"][9]["last_hits"]
+            except:
+                    p10lasthit = 0
+            try:
+                    p10denies = thisMatch["players"][9]["denies"]
+            except:
+                    p10denies = 0
+            try:
+                    p10gpm = thisMatch["players"][9]["gold_per_min"]
+            except:
+                    p10gpm = 0
+            try:
+                    p10xpm = thisMatch["players"][9]["xp_per_min"]
+            except:
+                    p10xpm = 0
+            try:
+                    p10level = thisMatch["players"][9]["level"]
+            except:
+                    p10level = 0
+
+
+
+            #nonPlayer Data
+
+            try:
+                    rwin = thisMatch["radiant_win"]
+            except:
+                    rwin = 0
+            try:
+                    duration = thisMatch["radiant_win"]
+            except:
+                    duration = 0
+            try:
+                    matchid = thisMatch["match_id"]
+            except:
+                    matchid = 0
+            try:
+                    lobbytype = thisMatch["lobby_type"]
+            except:
+                    lobbytype = 0
+            try:
+                    humans = thisMatch["human_players"]
+            except:
+                    humans = 0
+            try:
+                    gamemode = thisMatch["game_mode"]
+            except:
+                    gamemode = 0
+
+
+
+            # Combine data
+            output = str(p1hero) + "," + str(p1item0) + "," + str(p1item1) + "," + str(p1item2) + "," + str(p1item3) + "," + str(p1item4) + "," + str(p1item5) + "," + str(p1kills) + "," + str(p1deaths) + "," + str(p1assists) + "," + str(p1leaver) + "," + str(p1gold) + "," + str(p1lasthit) + "," + str(p1denies) + "," + str(p1gpm) + "," + str(p1xpm) + "," + str(p1level) +","+ str(p2hero) + "," + str(p2item0) + "," + str(p2item1) + "," + str(p2item2) + "," + str(p2item3)+"," + str(p2item4)+"," + str(p2item5)+"," + str(p2kills)+"," + str(p2deaths)+"," + str(p2assists)+"," + str(p2leaver)+"," + str(p2gold)+"," + str(p2lasthit)+"," + str(p2denies)+"," + str(p2gpm)+"," + str(p2xpm)+"," + str(p2level)+","+str(p3hero)+"," + str(p3item0)+"," + str(p3item1)+"," + str(p3item2)+"," + str(p3item3)+"," + str(p3item4)+"," + str(p3item5)+"," + str(p3kills)+"," + str(p3deaths)+"," + str(p3assists)+"," + str(p3leaver)+"," + str(p3gold)+"," + str(p3lasthit)+"," + str(p3denies)+"," + str(p3gpm)+"," + str(p3xpm)+"," + str(p3level)+","+str(p4hero)+"," + str(p4item0)+"," + str(p4item1)+"," + str(p4item2)+"," + str(p4item4)+"," + str(p4item4)+"," + str(p4item5)+"," + str(p4kills)+"," + str(p4deaths)+"," + str(p4assists)+"," + str(p4leaver)+"," + str(p4gold)+"," + str(p4lasthit)+"," + str(p4denies)+"," + str(p4gpm)+"," + str(p4xpm)+"," + str(p4level)+","+str(p5hero)+"," + str(p5item0)+"," + str(p5item1)+"," + str(p5item2)+"," + str(p5item5)+"," + str(p5item5)+"," + str(p5item5)+"," + str(p5kills)+"," + str(p5deaths)+"," + str(p5assists)+"," + str(p5leaver)+"," + str(p5gold)+"," + str(p5lasthit)+"," + str(p5denies)+"," + str(p5gpm)+"," + str(p5xpm)+"," + str(p5level)+","+str(p6hero)+"," + str(p6item0)+"," + str(p6item1)+"," + str(p6item2)+"," + str(p6item3)+"," + str(p6item4)+"," + str(p6item5)+"," + str(p6kills)+"," + str(p6deaths)+"," + str(p6assists)+"," + str(p6leaver)+"," + str(p6gold)+"," + str(p6lasthit)+"," + str(p6denies)+"," + str(p6gpm)+"," + str(p6xpm)+"," + str(p6level)+","+str(p7hero)+"," + str(p7item0)+"," + str(p7item1)+"," + str(p7item2)+"," + str(p7item3)+"," + str(p7item4)+"," + str(p7item5)+"," + str(p7kills)+"," + str(p7deaths)+"," + str(p7assists)+"," + str(p7leaver)+"," + str(p7gold)+"," + str(p7lasthit)+"," + str(p7denies)+"," + str(p7gpm)+"," + str(p7xpm)+"," + str(p7level)+","+str(p8hero)+"," + str(p8item0)+"," + str(p8item1)+"," + str(p8item2)+"," + str(p8item3)+"," + str(p8item4)+"," + str(p8item5)+"," + str(p8kills)+"," + str(p8deaths)+"," + str(p8assists)+"," + str(p8leaver)+"," + str(p8gold)+"," + str(p8lasthit)+"," + str(p8denies)+"," + str(p8gpm)+"," + str(p8xpm)+"," + str(p8level)+","+str(p9hero)+"," + str(p9item0)+"," + str(p9item1)+"," + str(p9item2)+"," + str(p9item3)+"," + str(p9item4)+"," + str(p9item5)+"," + str(p9kills)+"," + str(p9deaths)+"," + str(p9assists)+"," + str(p9leaver)+"," + str(p9gold)+"," + str(p9lasthit)+"," + str(p9denies)+"," + str(p9gpm)+"," + str(p9xpm)+"," + str(p9level)+","+str(p10hero)+"," + str(p10item0)+"," + str(p10item1)+"," + str(p10item2)+"," + str(p10item3)+"," + str(p10item4)+"," + str(p10item5)+"," + str(p10kills)+"," + str(p10deaths)+"," + str(p10assists)+"," + str(p10leaver)+"," + str(p10gold)+"," + str(p10lasthit)+"," + str(p10denies)+"," + str(p10gpm)+"," + str(p10xpm)+"," + str(p10level)+","+str(rwin)+","+str(duration)+","+str(matchid)+","+str(lobbytype)+","+str(humans)+","+str(gamemode)+"TEST\n"
+            #output  data
+
+            datafile.write(output)
+            testfile.write(str(matchid)+","+str(repeat)+","+str(nodeNum)+"\n")
+
+            #print(json.dumps(thisMatch["radiant_win"],sort_keys=True, indent =4))
+            nodeNum +=1
+            #time.sleep(1)
+
+    datafile.close()
+    testfile.close()
+
+    repeat += 1
+    startmatchid = matchID - 1
+
 
 #print(json.dumps(apiHeader, sort_keys=True, indent=4))
-
 
 
